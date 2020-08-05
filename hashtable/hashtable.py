@@ -22,6 +22,7 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
+        self.capacity = [None] * 10
 
 
     def get_num_slots(self):
@@ -35,6 +36,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return len(self.capacity)
 
 
     def get_load_factor(self):
@@ -46,15 +48,29 @@ class HashTable:
         # Your code here
 
 
-    def fnv1(self, key):
-        """
-        FNV-1 Hash, 64-bit
+    # def fnv1(self, key):
+    #     """
+    #     FNV-1 Hash, 64-bit
 
-        Implement this, and/or DJB2.
-        """
+    #     Implement this, and/or DJB2.
+    #     """
 
-        # Your code here
+    #     # Your code here 
+    #     FNV_offset_basis = 14695981039346656037
+    #     FNV_prime = 1099511628211
 
+    #     hashed_var = FNV_offset_basis
+
+    #     string_bytes = key.encode()
+
+    #     for b in string_bytes:
+    #         hashed_var = hashed_var * FNV_prime
+    #         hashed_var = hashed_var ^ b
+
+    #     return hashed_var
+    # chooses a big random number, usually prime
+    # loop over the bytes of our string, and do something(bits)
+    # return the something(bits)
 
     def djb2(self, key):
         """
@@ -62,8 +78,16 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        hash_var = 5381
+        byte_array = key.encode()
 
+        for byte in byte_array:
+            # the modulus keeps it 32-bit, python ints don't overflow
+            # hash_var = (hash_var * 33) + ord(byte)
+            # hash_var = ((hash_var * 33) ^ byte) % 0x100000000
+            hash_var = ((hash_var << 5) + hash_var ) + byte
+
+        return hash_var
 
     def hash_index(self, key):
         """
@@ -82,7 +106,12 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        hashed_key = self.djb2(key)
 
+        idex = hashed_key % len(self.capacity)
+
+        self.capacity[idex] = value
+ 
 
     def delete(self, key):
         """
@@ -93,6 +122,9 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        hashed_key = self.djb2(key)
+        index = hashed_key % len(self.capacity)
+        self.capacity[index] = None
 
 
     def get(self, key):
@@ -104,6 +136,11 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        hashed_key = self.djb2(key)
+
+        index = hashed_key % len(self.capacity)
+        value = self.capacity[index]
+        return value
 
 
     def resize(self, new_capacity):
