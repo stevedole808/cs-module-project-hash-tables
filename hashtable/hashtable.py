@@ -22,7 +22,9 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
-        self.capacity = [None] * 10
+        self.capacity = capacity
+        self.new_list = [None] * capacity
+        self.count = 0
 
 
     def get_num_slots(self):
@@ -46,6 +48,11 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        for i in self.new_list:
+            if i is not None:
+                self.count += 1
+        load_factor = self.count // self.get_num_slots()
+        return load_factor
 
 
     # def fnv1(self, key):
@@ -106,11 +113,26 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        hashed_key = self.djb2(key)
+        # hashed_key = self.djb2(key)
 
-        idex = hashed_key % len(self.capacity)
+        # idex = hashed_key % len(self.capacity)
 
-        self.capacity[idex] = value
+        # self.capacity[idex] = value
+        hashed_key = self.hash_index(key)
+        current_node = self.new_list[hashed_key]
+        if not current_node:
+            self.new_list[hashed_key] = HashTableEntry(key, value)
+            self.count += 1
+        else:
+            while current_node:
+                if current_node.key == key and current_node.value == value:
+                    return
+                elif not current_node:
+                    current_node.next = HashTableEntry(key, value)
+                    self.count += 1
+                    return
+                else:
+                    current_node = current_node.next
  
 
     def delete(self, key):
@@ -122,11 +144,23 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        hashed_key = self.djb2(key)
-        index = hashed_key % len(self.capacity)
-        self.capacity[index] = None
+        # hashed_key = self.djb2(key)
+        # index = hashed_key % len(self.capacity)
+        # self.capacity[index] = None
+        hashed_key = self.hash_index(key)
+        current_node = self.new_list[hashed_key]
+        if current_node == key:
+            current_node = None
+            return 
+        else:
+            while current_node.next:
+                if current_node.next.key == key:
+                    current_node.next == None
+                    return
+                else:
+                    current_node = current_node.next
 
-
+                
     def get(self, key):
         """
         Retrieve the value stored with the given key.
@@ -136,12 +170,18 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        hashed_key = self.djb2(key)
-
-        index = hashed_key % len(self.capacity)
-        value = self.capacity[index]
-        return value
-
+        # hashed_key = self.djb2(key)
+        # index = hashed_key % len(self.capacity)
+        # value = self.capacity[index]
+        # return value
+        hashed_key = self.hash_index(key)
+        current_node = self.new_list[hashed_key]
+        while current_node:
+            if current_node.key == key:
+                return current_node.value
+            else:
+                current_node = current_node.next
+        return current_node
 
     def resize(self, new_capacity):
         """
