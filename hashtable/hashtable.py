@@ -22,6 +22,9 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
+        self.capacity = capacity
+        self.new_list = [None] * capacity
+        self.count = 0
 
 
     def get_num_slots(self):
@@ -35,6 +38,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return len(self.capacity)
 
 
     def get_load_factor(self):
@@ -44,17 +48,36 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        for i in self.new_list:
+            if i is not None:
+                self.count += 1
+        load_factor = self.count // self.get_num_slots()
+        return load_factor
 
 
-    def fnv1(self, key):
-        """
-        FNV-1 Hash, 64-bit
+    # def fnv1(self, key):
+    #     """
+    #     FNV-1 Hash, 64-bit
 
-        Implement this, and/or DJB2.
-        """
+    #     Implement this, and/or DJB2.
+    #     """
 
-        # Your code here
+    #     # Your code here 
+    #     FNV_offset_basis = 14695981039346656037
+    #     FNV_prime = 1099511628211
 
+    #     hashed_var = FNV_offset_basis
+
+    #     string_bytes = key.encode()
+
+    #     for b in string_bytes:
+    #         hashed_var = hashed_var * FNV_prime
+    #         hashed_var = hashed_var ^ b
+
+    #     return hashed_var
+    # chooses a big random number, usually prime
+    # loop over the bytes of our string, and do something(bits)
+    # return the something(bits)
 
     def djb2(self, key):
         """
@@ -62,8 +85,16 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        hash_var = 5381
+        byte_array = key.encode()
 
+        for byte in byte_array:
+            # the modulus keeps it 32-bit, python ints don't overflow
+            # hash_var = (hash_var * 33) + ord(byte)
+            # hash_var = ((hash_var * 33) ^ byte) % 0x100000000
+            hash_var = ((hash_var << 5) + hash_var ) + byte
+
+        return hash_var
 
     def hash_index(self, key):
         """
@@ -82,7 +113,28 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # hashed_key = self.djb2(key)
 
+        # idex = hashed_key % len(self.capacity)
+
+        # self.capacity[idex] = value
+        hashed_key = self.hash_index(key)
+        current_node = self.new_list[hashed_key]
+        if not current_node:
+            self.new_list[hashed_key] = HashTableEntry(key, value)
+            self.count += 1
+        else:
+            while current_node:
+                if current_node.key == key:
+                    current_node.value = value
+                    return 
+                elif not current_node:
+                    current_node.next = HashTableEntry(key, value)
+                    self.count += 1
+                    return
+                else:
+                    current_node = current_node.next
+ 
 
     def delete(self, key):
         """
@@ -93,8 +145,23 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # hashed_key = self.djb2(key)
+        # index = hashed_key % len(self.capacity)
+        # self.capacity[index] = None
+        hashed_key = self.hash_index(key)
+        current_node = self.new_list[hashed_key]
+        if current_node.key == key:
+            current_node.key = None
+            return 
+        else:
+            while current_node.next:
+                if current_node.next.key == key:
+                    current_node.next == None
+                    return
+                else:
+                    current_node = current_node.next
 
-
+                
     def get(self, key):
         """
         Retrieve the value stored with the given key.
@@ -104,7 +171,18 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        # hashed_key = self.djb2(key)
+        # index = hashed_key % len(self.capacity)
+        # value = self.capacity[index]
+        # return value
+        hashed_key = self.hash_index(key)
+        current_node = self.new_list[hashed_key]
+        while current_node:
+            if current_node.key == key:
+                return current_node.value
+            else:
+                current_node = current_node.next
+        return current_node
 
     def resize(self, new_capacity):
         """
@@ -114,6 +192,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        if get_load_factor() > 0.7:
+            
 
 
 
