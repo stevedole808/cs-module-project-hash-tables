@@ -125,8 +125,9 @@ class HashTable:
             self.count += 1
         else:
             while current_node:
-                if current_node.key == key and current_node.value == value:
-                    return
+                if current_node.key == key:
+                    current_node.value = value
+                    return 
                 elif not current_node:
                     current_node.next = HashTableEntry(key, value)
                     self.count += 1
@@ -149,8 +150,8 @@ class HashTable:
         # self.capacity[index] = None
         hashed_key = self.hash_index(key)
         current_node = self.new_list[hashed_key]
-        if current_node == key:
-            current_node = None
+        if current_node.key == key:
+            current_node.key = None
             return 
         else:
             while current_node.next:
@@ -191,6 +192,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        if get_load_factor() > 0.7:
+            
 
 
 
