@@ -22,6 +22,8 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
+        self.capacity = [None] * 10
+        self.count = 0
 
 
     def get_num_slots(self):
@@ -63,7 +65,16 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
+        hash_var = 5381
+        byte_array = key.encode()
 
+        for byte in byte_array:
+            # the modulus keeps it 32-bit, python ints don't overflow
+            # hash_var = (hash_var * 33) + ord(byte)
+            # hash_var = ((hash_var * 33) ^ byte) % 0x100000000
+            hash_var = ((hash_var << 5) + hash_var ) + byte
+
+        return hash_var
 
     def hash_index(self, key):
         """
@@ -72,7 +83,12 @@ class HashTable:
         """
         #return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
-
+        
+    def get_index(self, key):
+        hashed_key = self.djb2(key)
+        hashed_key %= len(self.capacity)
+        return hashed_key
+        
     def put(self, key, value):
         """
         Store the value with the given key.
@@ -82,7 +98,9 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        hashed_key = self.get_index(key)
+        self.capacity[hashed_key] = value
+        self.count += 1
 
     def delete(self, key):
         """
@@ -92,7 +110,9 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        index = self.get_index(key)
+        self.capacity[index] = None
+
 
 
     def get(self, key):
@@ -104,6 +124,9 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        hashed_key = self.get_index(key)
+        return self.capacity[hashed_key]
+        
 
 
     def resize(self, new_capacity):
