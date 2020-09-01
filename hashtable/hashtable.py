@@ -37,6 +37,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return len(self.capacity)
 
 
     def get_load_factor(self):
@@ -113,8 +114,6 @@ class HashTable:
         index = self.get_index(key)
         self.capacity[index] = None
 
-
-
     def get(self, key):
         """
         Retrieve the value stored with the given key.
@@ -127,7 +126,6 @@ class HashTable:
         hashed_key = self.get_index(key)
         return self.capacity[hashed_key]
         
-
 
     def resize(self, new_capacity):
         """
